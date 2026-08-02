@@ -4,3 +4,8 @@
 # QtDragon shows a spindle speed readout when the VFD feedback reaches it.
 # The hy_vfd component already exports the feedback in cncRouter.hal.
 #net spindle-speed-fb => spindle.0.speed-in
+
+# QtDragon supplies its own tool change dialog; wire it to iocontrol here.
+net tool-change iocontrol.0.tool-change => hal_manualtoolchange.change
+net tool-changed iocontrol.0.tool-changed <= hal_manualtoolchange.changed
+net tool-number iocontrol.0.tool-prep-number => hal_manualtoolchange.number
