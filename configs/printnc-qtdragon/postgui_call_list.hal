@@ -2,3 +2,4 @@
 
 source custom_postgui.hal
 source progress.hal
+source eta-panel.hal

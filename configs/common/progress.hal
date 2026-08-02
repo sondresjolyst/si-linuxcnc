@@ -1,11 +1,4 @@
 # Program progress and run time estimate.
-# Loaded from postgui_call_list.hal so the GUI's eta.* pins already exist.
+# Exports the progress.* pins, readable in halshow and halmeter.
 
 loadusr -Wn progress ../common/progress.py
-
-net prog-percent progress.percent     => eta.percent
-net prog-elapsed progress.elapsed-min => eta.elapsed-min
-net prog-remain  progress.remain-min  => eta.remain-min
-net prog-total   progress.total-min   => eta.total-min
-net prog-line    progress.line        => eta.line
-net prog-lines   progress.lines       => eta.lines
