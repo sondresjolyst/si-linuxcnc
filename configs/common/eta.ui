@@ -3,7 +3,7 @@
      Loaded as HAL component "eta", so widget id "percent" becomes eta.percent. -->
 <interface>
   <requires lib="gtk+" version="3.0"/>
-  <object class="GtkWindow" id="eta_window">
+  <object class="GtkWindow" id="window1">
     <property name="title">Program progress</property>
     <child>
       <object class="GtkGrid" id="eta_grid">
