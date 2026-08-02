@@ -1,8 +1,8 @@
 # Include your custom_postgui HAL commands here
 # This file will not be overwritten when you run stepconf again
 
-# QtDragon shows a spindle speed readout when the VFD feedback reaches it.
-# The hy_vfd component already exports the feedback in cncRouter.hal.
+# QtDragon reads the spindle speed from spindle.0.speed-in, in rev/sec, while
+# hy_vfd reports RPM. Connecting the two needs a scale component dividing by 60.
 #net spindle-speed-fb => spindle.0.speed-in
 
 # QtDragon supplies its own tool change dialog; wire it to iocontrol here.
