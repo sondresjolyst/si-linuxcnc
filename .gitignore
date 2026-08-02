@@ -5,13 +5,10 @@
 # LinuxCNC runtime state
 *.bak
 *.new
-autosave.halscope
-halshow.preferences
 __pycache__/
 *.pyc
 
-# GUI preference / log files, per machine
-*.pref
+# Logs and history, regenerated per machine
 *.log
 mdi_history.dat
 machine_log.dat

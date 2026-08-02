@@ -1,0 +1,11 @@
+[DEFAULT]
+gtk_theme = Adwaita-dark
+gcode_theme = oblivion
+abs_color = #00AAFF
+rel_color = #FFFFFF
+dtg_color = #FFD700
+homed_color = #00FF00
+unhomed_color = #FF5555
+spindle_start_rpm = 3000.0
+spindle_bar_min = 3000.0
+spindle_bar_max = 24000.0
