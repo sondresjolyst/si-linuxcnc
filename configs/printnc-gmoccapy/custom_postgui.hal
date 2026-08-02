@@ -1,0 +1,8 @@
+# Include your custom_postgui HAL commands here
+# This file will not be overwritten when you run stepconf again
+# net spindle-speed-fb <= pyvcp.spindle_feedback_bar
+# net spindle-at-speed <= pyvcp.spindle_at_speed_led
+
+#net spindle-at-speed => pyvcp.spindle-at-speed
+#net pyvcp-spindle-rpm spindle-vfd.spindle-speed-fb => pyvcp.spindle-speed
+#net pyvcp-modbus-ok spindle-vfd.hycomm-ok => pyvcp.hycomm-ok

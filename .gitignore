@@ -1,0 +1,17 @@
+# Editor swap files
+.*.swp
+*~
+
+# LinuxCNC runtime state
+*.bak
+*.new
+autosave.halscope
+halshow.preferences
+__pycache__/
+*.pyc
+
+# GUI preference / log files, per machine
+*.pref
+*.log
+mdi_history.dat
+machine_log.dat
