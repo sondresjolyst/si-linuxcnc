@@ -3,3 +3,5 @@
 
 
 source ../common/manualtoolchange.hal
+
+source ../common/progress.hal

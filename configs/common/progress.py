@@ -68,7 +68,9 @@ def main():
         component.newpin(name, hal.HAL_FLOAT, hal.HAL_OUT)
     component.ready()
 
-    stat = linuxcnc.stat()
+    # The component is loaded before milltask, so the status channel is not
+    # there yet on the first passes through the loop.
+    stat = None
 
     current_file = None
     total_lines = 0
@@ -84,8 +86,11 @@ def main():
         last_tick = now
 
         try:
+            if stat is None:
+                stat = linuxcnc.stat()
             stat.poll()
-        except linuxcnc.error:
+        except (linuxcnc.error, OSError):
+            stat = None
             continue
 
         if stat.file != current_file:
