@@ -135,17 +135,23 @@ Fill into `[TOOLSENSOR]`:
 
 ### 5. Dry-run the probe
 
-Machine homed, **no tool in the collet**, spindle off. Hold the setter plunger
-down by hand and run:
+Machine homed, spindle off. Press the plunger *lightly*, far enough that the
+panel LED goes green — bottoming it trips the over-travel instead and faults
+joint 3. Hold it there and run:
 
     o<setter_probe> call
 
-It must abort immediately with a probe-already-tripped error. That proves
-LinuxCNC is reading the sensor.
+It positions to `SAFE_Z` and X/Y first, then aborts on the probe move with
 
-Release it and run again. The collet nut should travel to the setter and stop
-on contact. Hand on the e-stop for this one — a wrong `X`/`Y` sends it
-somewhere else, and a wrong polarity means it does not stop at all.
+    Probe is already tripped when starting G38.2 or G38.3 move
+
+That proves LinuxCNC is reading the sensor.
+
+Release it and run again. The tool should travel to the setter and stop on
+contact. Hand on the e-stop for this one — a wrong `X`/`Y` sends it somewhere
+else, and a wrong polarity means it does not stop at all. Use a tool whose
+trigger height you already measured rather than a bare collet: `MAXPROBE` is
+sized for tools, and a bare nut may not reach within it.
 
 ### 6. Calibrate
 
