@@ -1,0 +1,28 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<pyvcp>
+  <labelframe text="Tool setter">
+    <font>("Helvetica",10)</font>
+
+    <button>
+      <relief>RAISED</relief>
+      <bd>3</bd>
+      <halpin>"setter-zero"</halpin>
+      <text>"Zero Z from setter"</text>
+      <font>("Helvetica",10)</font>
+    </button>
+
+    <hbox>
+      <label>
+        <text>"probe  "</text>
+        <font>("Helvetica",10)</font>
+      </label>
+      <led>
+        <halpin>"probe-led"</halpin>
+        <size>18</size>
+        <on_color>"green"</on_color>
+        <off_color>"red"</off_color>
+      </led>
+    </hbox>
+
+  </labelframe>
+</pyvcp>

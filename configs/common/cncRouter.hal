@@ -238,6 +238,17 @@ net min-home-xz	<= hal_gpio.PIN33-in
 #net all-limit   <= hal_gpio.PIN24-in
 #pin 22 is the eSTOP
 
+##############################################
+#				Probe Input
+##############################################
+# Z tool setter, green wire, on a spare opto input of the breakout board.
+# PIN24 is a guess until the terminal is traced at the machine: jumper each
+# free input terminal to the input GND and watch which pin flips.
+#   halcmd -kf  ->  show pin hal_gpio
+# probe-input must read FALSE with the plunger released. If it reads TRUE,
+# swap PIN24-in-not for PIN24-in.
+net probe-input motion.probe-input <= hal_gpio.PIN24-in-not
+
 #net X-home hal_pi_gpio.pin-22-in => axis.0.home-sw-in axis.0.neg-lim-sw-in
 #net Y-home hal_pi_gpio.pin-24-in => axis.1.home-sw-in axis.1.neg-lim-sw-in
 #net Z-home hal_pi_gpio.pin-26-in => axis.2.home-sw-in axis.2.neg-lim-sw-in

@@ -6,3 +6,7 @@
 #net spindle-at-speed => pyvcp.spindle-at-speed
 #net pyvcp-spindle-rpm spindle-vfd.spindle-speed-fb => pyvcp.spindle-speed
 #net pyvcp-modbus-ok spindle-vfd.hycomm-ok => pyvcp.hycomm-ok
+
+# Tool setter panel, setter.xml.
+net probe-input => pyvcp.probe-led
+net setter-zero pyvcp.setter-zero => halui.mdi-command-00

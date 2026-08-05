@@ -1,0 +1,21 @@
+(setter_probe -- two-pass probe onto the fixed tool setter)
+(Leaves the tool at the trigger point. Called by setter_cal and setter_zero.)
+(Position and speeds come from [TOOLSENSOR] in the ini file.)
+(Machine must be homed: the move to the setter is in G53.)
+
+o<setter_probe> sub
+
+  M5
+
+  G21 G40 G49 G90 G94
+
+  G53 G0 Z#<_ini[TOOLSENSOR]SAFE_Z>
+  G53 G0 X#<_ini[TOOLSENSOR]X> Y#<_ini[TOOLSENSOR]Y>
+
+  G91
+  G38.2 Z[0 - #<_ini[TOOLSENSOR]MAXPROBE>] F#<_ini[TOOLSENSOR]SEARCH_VEL>
+  G0 Z0.5
+  G38.2 Z-1 F#<_ini[TOOLSENSOR]PROBE_VEL>
+  G90
+
+o<setter_probe> endsub

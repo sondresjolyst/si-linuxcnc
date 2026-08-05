@@ -1,0 +1,28 @@
+(setter_cal -- tie the setter to the current workpiece)
+(Run once per setup, after Z has been zeroed on the workpiece top with)
+(whatever tool is in the collet:  o<setter_cal> call)
+(Rerun after moving the setter, after a new workpiece, or after re-zeroing)
+(Z by hand.)
+
+(D is the setter trigger height in the active work coordinate system. It is a)
+(property of the setup, not of the tool, so any later tool can be zeroed from)
+(it. It is parked in the G59.3 origin, which this machine does not otherwise)
+(use, because that parameter is persistent across restarts:)
+(  #5383 = D, #5381 = 1 marks it valid. D is negative when the workpiece top)
+(  sits above the setter trigger height, so a zero test will not do.)
+
+o<setter_cal> sub
+
+  M70
+
+  o<setter_probe> call
+
+  G10 L2 P9 X1 Z#5063
+
+  (debug, setter calibrated: D = #5383 mm above work Z zero)
+
+  G53 G0 Z#<_ini[TOOLSENSOR]SAFE_Z>
+
+  M72
+
+o<setter_cal> endsub
