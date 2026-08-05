@@ -156,7 +156,7 @@ sized for tools, and a bare nut may not reach within it.
 ### 6. Calibrate
 
 With a tool clamped and Z zeroed on the workpiece top the way you normally do
-it:
+it, press **Calibrate setter** on the pyvcp panel, or run
 
     o<setter_cal> call
 
@@ -183,10 +183,12 @@ pyvcp panel, or run
     o<setter_zero> call
 
 Z zero is restored. The panel's probe LED follows `motion.probe-input` — green
-means triggered, so it should be red with the plunger released. Calibration has
-no button on purpose: it is a once-per-setup command, and a stray click on it
-after a tool change would store a wrong D. X and Y are untouched, so they survive a tool change on
-their own.
+means triggered, so it should be red with the plunger released. X and Y are
+untouched, so they survive a tool change on their own.
+
+New setup: Touch Off Z on the workpiece the way you always do, then press
+**Calibrate setter**. A stray press of it stores a D against whatever Z zero is
+current, so keep it to once per setup.
 
 Recalibrate with `setter_cal` whenever the workpiece or the setter moves. The
 macro cannot detect a stale D — it will happily zero against the previous

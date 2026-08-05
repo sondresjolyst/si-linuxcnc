@@ -11,6 +11,14 @@
       <font>("Helvetica",10)</font>
     </button>
 
+    <button>
+      <relief>RAISED</relief>
+      <bd>3</bd>
+      <halpin>"setter-cal"</halpin>
+      <text>"Calibrate setter"</text>
+      <font>("Helvetica",10)</font>
+    </button>
+
     <hbox>
       <label>
         <text>"probe  "</text>
