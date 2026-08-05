@@ -24,17 +24,10 @@ Position, travel and speeds come from `[TOOLSENSOR]` in
 
 ## Still open
 
-- Which breakout board input terminal the probe gets. All the board's inputs
-  look occupied by limit switches, but `min-home-y1` on `PIN26` has no reader
-  in HAL, so whatever switch sits on that terminal is ignored today — the
-  leftover of an unfinished gantry-squaring setup. Candidates, best first: a
-  fifth input if the board has one, the `PIN26` terminal at the cost of Y
-  squaring later, or two normally-closed limit switches put in series on one
-  terminal to free another.
 - Whether the over-travel pair goes into the e-stop chain or onto a spare
   input. Step 2 assumes the e-stop chain.
-- `[TOOLSENSOR]` `X`, `Y`, `SAFE_Z`, `MAXPROBE` are placeholders, and the probe
-  input pin `PIN24` is a guess. Steps 3 and 4 settle them.
+- `[TOOLSENSOR]` `X`, `Y`, `SAFE_Z`, `MAXPROBE` are placeholders. Step 4
+  settles them.
 
 ## At the machine
 
@@ -78,7 +71,7 @@ within a pair either wire can take either end.
 
 | Wire | Goes to |
 |---|---|
-| red | free input terminal on the breakout board |
+| red | breakout board terminal `P11`, which reaches header pin 24 |
 | black | input GND/COM, the terminal the limit switch returns land on |
 | green | e-stop chain, in series with the e-stop button |
 | yellow | the other side of that break in the e-stop chain |
@@ -100,12 +93,25 @@ Power up, start LinuxCNC, press the plunger by hand and watch the probe LED on
 the pyvcp panel.
 
 - Green when pressed, red when released: correct, move on.
-- Backwards: swap `PIN24-in-not` for `PIN24-in` in `configs/common/cncRouter.hal`.
-- No reaction: the probe wire is not on the terminal that reaches header pin
-  24. Run `halcmd -kf`, `show pin hal_gpio`, press the plunger and see which
-  `hal_gpio.PINxx-in` flips. `PIN26`, `PIN32` and `PIN33` are the limit inputs
-  already in use. Put the pin that responds into the `net probe-input` line,
-  and add it to `inputs=` on the `loadrt hal_gpio` line if it is not listed.
+- Backwards: swap `PIN24-in` for `PIN24-in-not` in `configs/common/cncRouter.hal`.
+- No reaction: the probe wire is not on `P11`. Trace the terminal with
+  LinuxCNC closed, which reads pins without driving anything:
+
+      cat > /tmp/probetrace.hal <<'EOF'
+      loadrt hal_gpio inputs=PIN3,PIN5,PIN7,PIN8,PIN10,PIN15,PIN22,PIN24,PIN26,PIN32,PIN33,PIN36,PIN38,PIN40
+      loadrt threads name1=t1 period1=1000000
+      addf hal_gpio.read t1
+      start
+      EOF
+      halrun -I -f /tmp/probetrace.hal
+
+  Run `show pin hal_gpio` at the `halcmd:` prompt, press the plunger, run it
+  again and see which pin flipped. Press a limit switch first as a control —
+  `PIN26`, `PIN32` and `PIN33` are the limit inputs already in use, and if none
+  of them move either then the fault is board power, not the terminal. Put the
+  pin that responds into the `net probe-input` line, and add it to `inputs=` on
+  the `loadrt hal_gpio` line if it is not listed. Don't use `sudo`: halrun
+  refuses to run as root.
 
 Do not go further until the LED follows the plunger. Everything below drives
 the spindle at the setter.
