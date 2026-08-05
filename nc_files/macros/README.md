@@ -24,8 +24,6 @@ Position, travel and speeds come from `[TOOLSENSOR]` in
 
 ## Still open
 
-- Whether the over-travel pair goes into the e-stop chain or onto a spare
-  input. Step 2 assumes the e-stop chain.
 - `[TOOLSENSOR]` `X`, `Y`, `SAFE_Z`, `MAXPROBE` are placeholders. Step 4
   settles them.
 
@@ -73,19 +71,19 @@ within a pair either wire can take either end.
 |---|---|
 | red | breakout board terminal `P11`, which reaches header pin 24 |
 | black | input GND/COM, the terminal the limit switch returns land on |
-| green | e-stop chain, in series with the e-stop button |
-| yellow | the other side of that break in the e-stop chain |
+| green | breakout board terminal `P10`, header pin 22, in place of the ground strap that was there |
+| yellow | input GND/COM, same terminal as black |
 
 Don't reason about whether that common is 0 V or +V. Whatever makes a limit
 switch work makes this work.
 
-The over-travel pair belongs in the e-stop chain rather than on a spare input,
-because there it stops the machine even when the software is the thing that has
-gone wrong — which is exactly when the plunger gets driven to its stop. Being
-normally closed it sits in series with the e-stop button directly. There is no
-physical e-stop input in HAL today: `estop-out` loops
-`iocontrol.0.user-enable-out` straight back into `iocontrol.0.emc-enable-in`,
-so the real chain is hardware.
+The over-travel pair lands on Z's negative limit, `joint.3.neg-lim-sw-in`, which
+had nothing on it. Bottoming the plunger faults the machine; Override Limits
+jogs Z back off it.
+
+The contactor chain runs at 230 V, so the pair stays out of it. To move it into
+hardware later, put green and yellow on the coil of a 24 V interface relay and
+break the chain with that relay's NO contact. The setter cable doesn't change.
 
 ### 3. Check the input in LinuxCNC
 
@@ -112,6 +110,10 @@ the pyvcp panel.
   pin that responds into the `net probe-input` line, and add it to `inputs=` on
   the `loadrt hal_gpio` line if it is not listed. Don't use `sudo`: halrun
   refuses to run as root.
+
+Then the over-travel pair: with the machine on, push the plunger all the way to
+its stop. LinuxCNC must fault on a Z negative limit. Unplug the setter and it
+must do the same. Clear it with Override Limits.
 
 Do not go further until the LED follows the plunger. Everything below drives
 the spindle at the setter.

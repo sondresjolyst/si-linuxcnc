@@ -67,7 +67,7 @@ loadrt charge_pump
 # make posn loop type
 
 #loadrt hal_pi_gpio dir=58717087 exclude=0 
-loadrt hal_gpio inputs=PIN26,PIN32,PIN33,PIN24 outputs=PIN12,PIN37,PIN21,PIN19,PIN23,PIN29,PIN31,PIN35,PIN11,PIN16,PIN13,PIN18 
+loadrt hal_gpio inputs=PIN26,PIN32,PIN33,PIN24,PIN22 outputs=PIN12,PIN37,PIN21,PIN19,PIN23,PIN29,PIN31,PIN35,PIN11,PIN16,PIN13,PIN18 
 
 
 loadrt stepgen step_type=0,0,0,0
@@ -246,6 +246,13 @@ net min-home-xz	<= hal_gpio.PIN33-in
 # reads FALSE with the plunger released and TRUE when triggered, which is the
 # polarity motion.probe-input wants -- no -not here.
 net probe-input motion.probe-input <= hal_gpio.PIN24-in
+
+# The setter's over-travel pair, green and yellow, on breakout board terminal
+# P10 -- header pin 22, in place of the ground strap that was there. Normally
+# closed, so PIN22-in reads FALSE off the stop and TRUE when the plunger is
+# bottomed or the cable is cut. Recover with Override Limits.
+net z-neg-limit <= hal_gpio.PIN22-in
+net z-neg-limit => joint.3.neg-lim-sw-in
 
 #net X-home hal_pi_gpio.pin-22-in => axis.0.home-sw-in axis.0.neg-lim-sw-in
 #net Y-home hal_pi_gpio.pin-24-in => axis.1.home-sw-in axis.1.neg-lim-sw-in
