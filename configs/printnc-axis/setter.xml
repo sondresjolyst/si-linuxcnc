@@ -12,7 +12,7 @@
       <pady>2</pady>
     </button>
 
-    <label><text>" "</text><font>("Helvetica",2)</font></label>
+    <label><text>" "</text><font>("Helvetica",6)</font></label>
 
     <button>
       <relief>RAISED</relief>
@@ -23,7 +23,7 @@
       <pady>2</pady>
     </button>
 
-    <label><text>" "</text><font>("Helvetica",2)</font></label>
+    <label><text>" "</text><font>("Helvetica",6)</font></label>
 
     <button>
       <relief>RAISED</relief>
@@ -65,7 +65,7 @@
       <pady>2</pady>
     </button>
 
-    <label><text>" "</text><font>("Helvetica",2)</font></label>
+    <label><text>" "</text><font>("Helvetica",6)</font></label>
 
     <button>
       <relief>RAISED</relief>

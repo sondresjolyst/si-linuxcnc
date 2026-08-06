@@ -77,6 +77,13 @@ Buttons are bound to `halui.mdi-command-NN` in `custom_postgui.hal`, where NN is
 the position of the corresponding `MDI_COMMAND` entry under `[HALUI]`.
 Reordering one requires reordering the other.
 
+The three touch off buttons are routed through `setter_confirm.py`, a userspace
+component started from `custom_postgui.hal`. It presents an OK/Cancel dialog
+naming the axis and releases the command only on OK, so pressing the wrong one
+of three adjacent buttons is caught before a zero is overwritten. To guard
+another button, add its pin pair to `BUTTONS` and net it through the component
+the same way.
+
 ## Wiring
 
 Two isolated normally-closed contacts, both switched against the shared input
