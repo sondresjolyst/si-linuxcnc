@@ -59,6 +59,17 @@
     <button>
       <relief>RAISED</relief>
       <bd>3</bd>
+      <halpin>"setter-cal"</halpin>
+      <text>"Calibrate setter"</text>
+      <font>("Helvetica",10)</font>
+      <pady>2</pady>
+    </button>
+
+    <label><text>" "</text><font>("Helvetica",2)</font></label>
+
+    <button>
+      <relief>RAISED</relief>
+      <bd>3</bd>
       <halpin>"setter-zero"</halpin>
       <text>"Touch new tool"</text>
       <font>("Helvetica",10)</font>

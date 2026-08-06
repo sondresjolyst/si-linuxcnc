@@ -22,28 +22,28 @@ those parameters persist in `linuxcnc.var` across restarts.
 
 ## Panel
 
-`setter.xml` adds two pyvcp panels: **Touch off**, holding the three axis
-buttons, and **Tool setter**, holding an LED that follows `motion.probe-input`
-and the tool change button.
+`setter.xml` adds two pyvcp panels, **Touch off** and **Tool setter**. Tool
+setter also carries an LED following `motion.probe-input`.
 
-| Button | Macro | Use |
-|---|---|---|
-| Touch off X | — | Sets X zero at the current position |
-| Touch off Y | — | Sets Y zero at the current position |
-| Touch off Z | `setter_touchoff_z` | Sets Z zero at the current position, then measures D |
-| Touch new tool | `setter_zero` | Probes the setter and restores Z zero from D |
+| Panel | Button | Macro | Effect |
+|---|---|---|---|
+| Touch off | Touch off X | — | Sets X zero at the current position |
+| Touch off | Touch off Y | — | Sets Y zero at the current position |
+| Touch off | Touch off Z | — | Sets Z zero at the current position |
+| Tool setter | Calibrate setter | `setter_cal` | Traverses to the setter, probes it, stores D |
+| Tool setter | Touch new tool | `setter_zero` | Traverses to the setter, probes it, restores Z zero from D |
 
-X and Y are unaffected by a tool change, so only **Touch new tool** is needed
-after a tool swap. **Touch off Z** recalibrates on every press; press it once
-per setup and again whenever the workpiece or the setter moves.
+A setup runs: touch off X, Y and Z, then **Calibrate setter** with that same
+tool still clamped. Every tool change afterwards needs only **Touch new tool** —
+X and Y are unaffected by a tool change.
 
-The AXIS Touch Off dialog remains available for offsets that must be typed.
+Recalibrate whenever the workpiece or the setter moves. The AXIS Touch Off
+dialog remains available for offsets that must be typed.
 
 ## Macros
 
 | Macro | Effect |
 |---|---|
-| `setter_touchoff_z` | Sets Z zero at the current position, then calls `setter_cal` |
 | `setter_cal` | Probes the setter and stores D against the current Z zero |
 | `setter_zero` | Probes the setter and restores Z zero from D |
 | `setter_probe` | Two-pass probing move used by the above |
@@ -157,9 +157,9 @@ setter.
    elsewhere, and an inverted polarity means it does not stop. Use a tool of
    known trigger height rather than a bare collet, which may not reach within
    `MAXPROBE`.
-6. Jog Z to the workpiece top and press **Touch off Z**. D is reported on the
-   status line; it is positive when the setter trigger point sits above the
-   workpiece top.
+6. Jog Z to the workpiece top, press **Touch off Z**, then **Calibrate
+   setter**. D is reported on the status line; it is positive when the setter
+   trigger point sits above the workpiece top.
 7. Confirm D survives a restart: run `(debug, #5383)`, quit LinuxCNC, check the
    value on line `5383` of `configs/printnc-axis/linuxcnc.var`, restart and run
    `(debug, #5383)` again. Worth repeating after a LinuxCNC upgrade.
