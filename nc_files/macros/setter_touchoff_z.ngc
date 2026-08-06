@@ -1,0 +1,14 @@
+(setter_touchoff_z -- set work Z zero and invalidate the setter calibration)
+
+(Sets work Z zero at the current position and clears the validity flag on D.)
+(A Z zero on new stock puts the workpiece top at a different height, which)
+(makes any existing D stale; clearing the flag makes setter_zero abort until)
+(setter_cal has run against the new zero. Does not move the machine.)
+
+o<setter_touchoff_z> sub
+
+  G10 L20 P0 Z0
+
+  G10 L2 P9 X0
+
+o<setter_touchoff_z> endsub

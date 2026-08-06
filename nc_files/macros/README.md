@@ -29,7 +29,7 @@ setter also carries an LED following `motion.probe-input`.
 |---|---|---|---|
 | Touch off | Touch off X | — | Sets X zero at the current position |
 | Touch off | Touch off Y | — | Sets Y zero at the current position |
-| Touch off | Touch off Z | — | Sets Z zero at the current position |
+| Touch off | Touch off Z | `setter_touchoff_z` | Sets Z zero at the current position and invalidates D |
 | Tool setter | Calibrate setter | `setter_cal` | Traverses to the setter, probes it, stores D |
 | Tool setter | Touch new tool | `setter_zero` | Traverses to the setter, probes it, restores Z zero from D |
 
@@ -44,12 +44,14 @@ dialog remains available for offsets that must be typed.
 
 | Macro | Effect |
 |---|---|
+| `setter_touchoff_z` | Sets Z zero at the current position and clears `#5381` |
 | `setter_cal` | Probes the setter and stores D against the current Z zero |
 | `setter_zero` | Probes the setter and restores Z zero from D |
 | `setter_probe` | Two-pass probing move used by the above |
 
-`setter_zero` aborts if `#5381` is not 1. It cannot detect a *stale* D and will
-zero against the previous setup's value.
+`setter_zero` aborts if `#5381` is not 1. Since a new Z zero puts the workpiece
+top at a different height and makes D stale, `setter_touchoff_z` clears the
+flag, so a calibration is required before the next tool change.
 
 The machine must be homed: the approach to the setter is issued in G53.
 
