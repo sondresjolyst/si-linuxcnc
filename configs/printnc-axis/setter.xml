@@ -43,7 +43,7 @@
 
     <hbox>
       <label>
-        <text>"probe  "</text>
+        <text>"Probe  "</text>
         <font>("Helvetica",10)</font>
       </label>
       <led>
