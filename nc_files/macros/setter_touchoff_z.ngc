@@ -1,8 +1,10 @@
 (setter_touchoff_z -- zero Z on the workpiece and calibrate the setter)
-(Jog down to the workpiece top, then run this instead of AXIS Touch Off:)
-(  o<setter_touchoff_z> call)
-(It sets Z zero here, then drives to the setter and measures D, so a later)
-(tool change only needs o<setter_zero> call.)
+
+(Sets work Z zero at the current position, then calls setter_cal to measure D.)
+(Intended to be run with the tool at the workpiece top, in place of a plain Z)
+(touch off, so that later tool changes need only setter_zero.)
+
+(Moves the machine: setter_cal traverses to the setter and probes it.)
 
 o<setter_touchoff_z> sub
 

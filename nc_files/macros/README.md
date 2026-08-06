@@ -1,197 +1,164 @@
-# Tool setter macros
+# Fixed tool setter
 
-A fixed tool setter standing at one spot on the table. Tools are clamped by
-hand in an ER20 collet, so stickout differs every time and the tool table
-cannot describe it. Instead the setter measures one number per *setup*:
+Restores Z zero after a tool change on a machine with hand-clamped ER20
+collets, where stickout varies with every tool and the tool table cannot
+describe it.
+
+## How it works
+
+The setter measures one value per setup:
 
     D = height of the setter trigger point above the workpiece top
 
-D does not depend on the tool, because zeroing Z on the part and triggering the
-setter both move by the same amount when stickout changes. Measure D once with
-a known-good Z zero, and every later tool is zeroed by probing the setter and
-declaring the trigger point to be D.
+D is independent of the tool: changing stickout shifts the workpiece touch-off
+point and the setter trigger point by the same amount. Once D is known, any
+tool is zeroed by probing the setter and declaring the trigger point to be D.
 
-    o<setter_touchoff_z> call   at the workpiece top, once per setup
-    o<setter_zero> call         after every tool change
+D is held in the G59.3 origin (`#5383`), with `#5381` as a validity flag, since
+those parameters persist in `linuxcnc.var` across restarts.
 
-`setter_touchoff_z` zeroes Z where the tool stands and then calls `setter_cal`,
-which is the measurement on its own for a Z zero set some other way.
-`setter_probe.ngc` holds the motion they share. D lives in the G59.3 origin
-(`#5383`, valid flag `#5381`) because those parameters are already persistent
-in `linuxcnc.var`. **G59.3 must not be used as a work coordinate system** —
-selecting it would move the machine by D.
+> G59.3 must not be selected as a work coordinate system. Doing so applies D as
+> a work offset and moves the machine.
 
-Position, travel and speeds come from `[TOOLSENSOR]` in
-`configs/printnc-axis/cncRouter.ini`.
+## Panel
 
-## At the machine
+`setter.xml` adds a pyvcp panel with four buttons and an LED following
+`motion.probe-input`.
 
-Working through this in order.
-
-### 1. What the setter actually is
-
-Metered on the bench, disconnected, nothing powered:
-
-| Measurement | Plunger free | Plunger pressed |
+| Button | Macro | Use |
 |---|---|---|
-| red ↔ black | closed, 0.8 ohm | opens on slight touch |
-| green ↔ yellow | closed, 0.8 ohm | opens at bottom of travel |
-| red ↔ green, red ↔ yellow, black ↔ green, black ↔ yellow | open | open |
-| any wire ↔ housing | open | open |
+| Touch off X | — | Sets X zero at the current position |
+| Touch off Y | — | Sets Y zero at the current position |
+| Touch off Z | `setter_touchoff_z` | Sets Z zero at the current position, then measures D |
+| Touch new tool | `setter_zero` | Probes the setter and restores Z zero from D |
 
-0.8 ohm reads the same in both meter directions, and the state changes with no
-supply connected, which only a mechanical contact does. So: two isolated
-normally-closed switches, red+black triggering on contact and green+yellow at
-the end of plunger travel. Nothing needs 24 V and the PNP/NPN question in the
-seller's sheet does not apply.
+X and Y are unaffected by a tool change, so only **Touch new tool** is needed
+after a tool swap. **Touch off Z** recalibrates on every press; press it once
+per setup and again whenever the workpiece or the setter moves.
 
-The seller's sheet says something different — green as the tool approach
-output, red and black both as supply, 24 V, PNP or NPN. It predicts red↔black
-closed in every plunger position and green↔yellow never closed, and the meter
-says the opposite of both. Treated as a generic listing blurb, not as this
-unit. Meter again if the setter is ever replaced.
+The AXIS Touch Off dialog remains available for offsets that must be typed.
 
-Normally closed is the safe polarity either way: a cut wire or a pulled
-connector looks the same as triggered, so LinuxCNC refuses to start a probe
-instead of driving a tool through the setter.
+## Macros
 
-### 2. Wire it, machine powered down
-
-The rule, whatever the colours turn out to be on a given unit: **the pair that
-opens on slight touch is the probe.** Measured here, that is red+black.
-
-Wired like the limit switches already on this machine — a contact between an
-input terminal and the shared input common. Dry contacts are not polarised, so
-within a pair either wire can take either end.
-
-| Wire | Goes to |
+| Macro | Effect |
 |---|---|
-| red | breakout board terminal `P11`, which reaches header pin 24 |
-| black | input GND/COM, the terminal the limit switch returns land on |
-| green | breakout board terminal `P10`, header pin 22, in place of the ground strap that was there |
-| yellow | input GND/COM, same terminal as black |
+| `setter_touchoff_z` | Sets Z zero at the current position, then calls `setter_cal` |
+| `setter_cal` | Probes the setter and stores D against the current Z zero |
+| `setter_zero` | Probes the setter and restores Z zero from D |
+| `setter_probe` | Two-pass probing move used by the above |
 
-Don't reason about whether that common is 0 V or +V. Whatever makes a limit
-switch work makes this work.
+`setter_zero` aborts if `#5381` is not 1. It cannot detect a *stale* D and will
+zero against the previous setup's value.
 
-The over-travel pair lands on Z's negative limit, `joint.3.neg-lim-sw-in`, which
-had nothing on it. Bottoming the plunger faults the machine; Override Limits
-jogs Z back off it.
+The machine must be homed: the approach to the setter is issued in G53.
 
-The contactor chain runs at 230 V, so the pair stays out of it. To move it into
-hardware later, put green and yellow on the coil of a 24 V interface relay and
-break the chain with that relay's NO contact. The setter cable doesn't change.
+## Configuration
 
-### 3. Check the input in LinuxCNC
+`[TOOLSENSOR]` in `configs/printnc-axis/cncRouter.ini`:
 
-Power up, start LinuxCNC, press the plunger by hand and watch the probe LED on
-the pyvcp panel.
+| Key | Meaning |
+|---|---|
+| `X`, `Y` | Setter centre, machine coordinates |
+| `SAFE_Z` | Machine Z for traverse to the setter; clears workpiece and clamps |
+| `MAXPROBE` | Maximum probing depth below `SAFE_Z` |
+| `SEARCH_VEL` | First-pass probing feed rate |
+| `PROBE_VEL` | Second-pass probing feed rate |
 
-- Green when pressed, red when released: correct, move on.
-- Backwards: swap `PIN24-in` for `PIN24-in-not` in `configs/common/cncRouter.hal`.
-- No reaction: the probe wire is not on `P11`. Trace the terminal with
-  LinuxCNC closed, which reads pins without driving anything:
+To size `MAXPROBE`, measure the machine Z at which a tool of known length
+triggers the setter. That fixes the trigger height, from which the depth
+reached by the shortest tool and the depth at which the collet nut would meet
+the setter body both follow. Choose a value that reaches the first and stops
+short of the second.
 
-      cat > /tmp/probetrace.hal <<'EOF'
-      loadrt hal_gpio inputs=PIN3,PIN5,PIN7,PIN8,PIN10,PIN15,PIN22,PIN24,PIN26,PIN32,PIN33,PIN36,PIN38,PIN40
-      loadrt threads name1=t1 period1=1000000
-      addf hal_gpio.read t1
-      start
-      EOF
-      halrun -I -f /tmp/probetrace.hal
+Buttons are bound to `halui.mdi-command-NN` in `custom_postgui.hal`, where NN is
+the position of the corresponding `MDI_COMMAND` entry under `[HALUI]`.
+Reordering one requires reordering the other.
 
-  Run `show pin hal_gpio` at the `halcmd:` prompt, press the plunger, run it
-  again and see which pin flipped. Press a limit switch first as a control —
-  `PIN26`, `PIN32` and `PIN33` are the limit inputs already in use, and if none
-  of them move either then the fault is board power, not the terminal. Put the
-  pin that responds into the `net probe-input` line, and add it to `inputs=` on
-  the `loadrt hal_gpio` line if it is not listed. Don't use `sudo`: halrun
-  refuses to run as root.
+## Wiring
 
-Then the over-travel pair: with the machine on, push the plunger all the way to
-its stop. LinuxCNC must fault on a Z negative limit. Unplug the setter and it
-must do the same. Clear it with Override Limits.
+Two isolated normally-closed contacts, both switched against the shared input
+common, wired as the machine's limit switches are:
 
-Do not go further until the LED follows the plunger. Everything below drives
-the spindle at the setter.
+| Contact | Terminal | HAL |
+|---|---|---|
+| probe, opens on light contact | `P11`, header pin 24 | `motion.probe-input` |
+| over-travel, opens at end of plunger travel | `P10`, header pin 22 | `joint.3.neg-lim-sw-in` |
 
-### 4. Measure the setter position
+Both pins must appear in the `inputs=` list of the `loadrt hal_gpio` line in
+`configs/common/cncRouter.hal`. Dry contacts are not polarised, so either
+conductor of a pair may take either end.
 
-Home the machine. Jog the tool over the setter centre, then read the machine
-coordinates — in AXIS switch the DRO to machine coordinates, or run
-`(debug, #<_abs_x> #<_abs_y> #<_abs_z>)` in MDI.
+Normally closed is fail-safe: a severed conductor reads as triggered, so a
+probing move is refused rather than begun. Bottoming the plunger faults the
+machine on a Z negative limit, which Override Limits clears so the spindle can
+be jogged clear of the setter.
 
-Fill into `[TOOLSENSOR]`:
+### Using a different sensor
 
-- `X`, `Y` — setter centre, machine coordinates.
-- `SAFE_Z` — machine Z the tool travels at when crossing the table to the
-  setter. High enough to clear the workpiece and clamps, at or below 0.
-- `MAXPROBE` — how far down from `SAFE_Z` the probe may search. Enough to
-  reach the setter with your shortest tool, not so much that a missed trigger
-  runs the spindle into the table.
+Meter the unit on the bench, disconnected and unpowered. A mechanical contact
+reads the same resistance in both meter polarities and changes state with no
+supply connected. If it behaves that way, no supply is needed and the PNP/NPN
+distinction in the datasheet does not apply.
 
-### 5. Dry-run the probe
+Identify the pairs by behaviour rather than by colour: **the contact that opens
+on slight touch is the probe**, and the one that opens at the end of plunger
+travel is the over-travel. Datasheets for these units are frequently generic
+and may contradict the meter; trust the meter.
 
-Machine homed, spindle off. Press the plunger *lightly*, far enough that the
-panel LED goes green — bottoming it trips the over-travel instead and faults
-joint 3. Hold it there and run:
+### Finding which header pin a terminal reaches
 
-    o<setter_probe> call
+Breakout board labels bear no relation to Raspberry Pi header numbers. To trace
+one, close LinuxCNC and read the pins without driving outputs:
 
-It positions to `SAFE_Z` and X/Y first, then aborts on the probe move with
+    cat > /tmp/probetrace.hal <<'EOF'
+    loadrt hal_gpio inputs=PIN3,PIN5,PIN7,PIN8,PIN10,PIN15,PIN22,PIN24,PIN26,PIN32,PIN33,PIN36,PIN38,PIN40
+    loadrt threads name1=t1 period1=1000000
+    addf hal_gpio.read t1
+    start
+    EOF
+    halrun -I -f /tmp/probetrace.hal
 
-    Probe is already tripped when starting G38.2 or G38.3 move
+Run `show pin hal_gpio` at the `halcmd:` prompt, operate the switch, and run it
+again to see which pin changed. Trigger a known-good limit switch first as a
+control; if nothing responds to that either, the fault is board power rather
+than the terminal. Note that `halrun` refuses to run as root, and that pin
+names take no leading zero — `PIN3`, not `PIN03`.
 
-That proves LinuxCNC is reading the sensor.
+### Putting the over-travel into the power chain
 
-Release it and run again. The tool should travel to the setter and stop on
-contact. Hand on the e-stop for this one — a wrong `X`/`Y` sends it somewhere
-else, and a wrong polarity means it does not stop at all. Use a tool whose
-trigger height you already measured rather than a bare collet: `MAXPROBE` is
-sized for tools, and a bare nut may not reach within it.
+The over-travel contact faults LinuxCNC but does not open the machine's power
+chain. To break the chain in hardware as well, drive the coil of an interface
+relay from the over-travel pair and wire that relay's NO contact into the
+chain. This keeps the sensor cable, which is handled by hand, out of the chain
+regardless of what the chain switches.
 
-### 6. Calibrate
+## Commissioning
 
-With a tool clamped, jog Z down until the tool meets the workpiece top, then
-press **Touch off Z** on the pyvcp panel, or run
+Verify the input before running anything that drives the spindle towards the
+setter.
 
-    o<setter_touchoff_z> call
-
-It sets Z zero where the tool stands, then drives to the setter and probes.
-Stand clear before pressing — the machine moves on its own from there.
-
-The status line reports D. Sanity-check the sign: positive when the setter
-trigger point sits above the workpiece top, negative when the workpiece is
-taller than the setter.
-
-### 7. Confirm D survives a restart
-
-Once, on the LinuxCNC version you actually run:
-
-    o<setter_cal> call
-    (debug, #5383)
-
-Quit LinuxCNC, check the number appears in `configs/printnc-axis/linuxcnc.var`
-on line `5383`, restart, and run `(debug, #5383)` again. Same value means the
-storage works. Repeat this check after a LinuxCNC upgrade.
-
-### 8. Use it
-
-New setup: jog to the X and Y datum and press **Touch off X** and **Touch off
-Y**, then jog Z down to the workpiece top and press **Touch off Z**. The panel
-buttons zero at 0 with no dialog; AXIS's own Touch Off still works if an offset
-needs typing.
-
-Tool change: stop, swap the tool, then press **Touch new tool** on the pyvcp
-panel, or run
-
-    o<setter_zero> call
-
-Z zero is restored. The panel's probe LED follows `motion.probe-input` — green
-means triggered, so it should be red with the plunger released. X and Y are
-untouched, so they survive a tool change on their own.
-
-**Touch off Z** recalibrates every time it is pressed, so press it once per
-setup and again whenever the workpiece or the setter moves. `setter_zero`
-cannot detect a stale D — it will happily zero against the previous setup's
-number.
+1. Press the plunger by hand and watch the panel LED: green on light contact,
+   red on release. If it is inverted, substitute `hal_gpio.PIN24-in-not` for
+   `hal_gpio.PIN24-in`. If it does not respond at all, trace the terminal.
+2. Push the plunger to its stop, and separately unplug the sensor. Both must
+   fault the machine on a Z negative limit. Clear with Override Limits.
+3. Home the machine, jog over the setter centre and record machine coordinates
+   — switch the AXIS DRO to machine coordinates, or run
+   `(debug, #<_abs_x> #<_abs_y> #<_abs_z>)` in MDI. Enter them in
+   `[TOOLSENSOR]`.
+4. Hold the plunger down lightly, enough for the LED to go green without
+   bottoming it, and run `o<setter_probe> call`. The macro traverses to
+   `SAFE_Z` and to X/Y, then aborts with `Probe is already tripped when
+   starting G38.2 or G38.3 move`, confirming the input reaches the motion
+   controller.
+5. Release the plunger and repeat. The tool must travel to the setter and stop
+   on contact. Keep a hand on the e-stop: an incorrect `X`/`Y` sends the tool
+   elsewhere, and an inverted polarity means it does not stop. Use a tool of
+   known trigger height rather than a bare collet, which may not reach within
+   `MAXPROBE`.
+6. Jog Z to the workpiece top and press **Touch off Z**. D is reported on the
+   status line; it is positive when the setter trigger point sits above the
+   workpiece top.
+7. Confirm D survives a restart: run `(debug, #5383)`, quit LinuxCNC, check the
+   value on line `5383` of `configs/printnc-axis/linuxcnc.var`, restart and run
+   `(debug, #5383)` again. Worth repeating after a LinuxCNC upgrade.

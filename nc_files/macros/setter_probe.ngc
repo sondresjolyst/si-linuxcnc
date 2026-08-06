@@ -1,7 +1,8 @@
 (setter_probe -- two-pass probe onto the fixed tool setter)
-(Leaves the tool at the trigger point. Called by setter_cal and setter_zero.)
-(Position and speeds come from [TOOLSENSOR] in the ini file.)
-(Machine must be homed: the move to the setter is in G53.)
+
+(Traverses to the setter and probes it twice, leaving the tool at the trigger)
+(point. Position and speeds come from [TOOLSENSOR] in the ini file. Requires a)
+(homed machine: the approach is issued in G53.)
 
 o<setter_probe> sub
 
