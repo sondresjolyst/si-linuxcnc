@@ -9,5 +9,7 @@
 
 # Tool setter panel, setter.xml.
 net probe-input => pyvcp.probe-led
-net setter-zero pyvcp.setter-zero => halui.mdi-command-00
-net setter-cal  pyvcp.setter-cal  => halui.mdi-command-01
+net setter-zero    pyvcp.setter-zero    => halui.mdi-command-00
+net touchoff-x     pyvcp.touchoff-x     => halui.mdi-command-01
+net touchoff-y     pyvcp.touchoff-y     => halui.mdi-command-02
+net touchoff-z     pyvcp.touchoff-z     => halui.mdi-command-03

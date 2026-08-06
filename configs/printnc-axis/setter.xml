@@ -6,16 +6,32 @@
     <button>
       <relief>RAISED</relief>
       <bd>3</bd>
-      <halpin>"setter-zero"</halpin>
-      <text>"Zero Z from setter"</text>
+      <halpin>"touchoff-x"</halpin>
+      <text>"Touch off X"</text>
       <font>("Helvetica",10)</font>
     </button>
 
     <button>
       <relief>RAISED</relief>
       <bd>3</bd>
-      <halpin>"setter-cal"</halpin>
-      <text>"Calibrate setter"</text>
+      <halpin>"touchoff-y"</halpin>
+      <text>"Touch off Y"</text>
+      <font>("Helvetica",10)</font>
+    </button>
+
+    <button>
+      <relief>RAISED</relief>
+      <bd>3</bd>
+      <halpin>"touchoff-z"</halpin>
+      <text>"Touch off Z"</text>
+      <font>("Helvetica",10)</font>
+    </button>
+
+    <button>
+      <relief>RAISED</relief>
+      <bd>3</bd>
+      <halpin>"setter-zero"</halpin>
+      <text>"Touch new tool"</text>
       <font>("Helvetica",10)</font>
     </button>
 

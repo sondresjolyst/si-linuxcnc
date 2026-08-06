@@ -11,21 +11,18 @@ setter both move by the same amount when stickout changes. Measure D once with
 a known-good Z zero, and every later tool is zeroed by probing the setter and
 declaring the trigger point to be D.
 
-    o<setter_cal> call     once per setup, while Z zero is still good
-    o<setter_zero> call    after every tool change
+    o<setter_touchoff_z> call   at the workpiece top, once per setup
+    o<setter_zero> call         after every tool change
 
-`setter_probe.ngc` holds the motion both share. D lives in the G59.3 origin
+`setter_touchoff_z` zeroes Z where the tool stands and then calls `setter_cal`,
+which is the measurement on its own for a Z zero set some other way.
+`setter_probe.ngc` holds the motion they share. D lives in the G59.3 origin
 (`#5383`, valid flag `#5381`) because those parameters are already persistent
 in `linuxcnc.var`. **G59.3 must not be used as a work coordinate system** —
 selecting it would move the machine by D.
 
 Position, travel and speeds come from `[TOOLSENSOR]` in
 `configs/printnc-axis/cncRouter.ini`.
-
-## Still open
-
-- `[TOOLSENSOR]` `X`, `Y`, `SAFE_Z`, `MAXPROBE` are placeholders. Step 4
-  settles them.
 
 ## At the machine
 
@@ -155,10 +152,13 @@ sized for tools, and a bare nut may not reach within it.
 
 ### 6. Calibrate
 
-With a tool clamped and Z zeroed on the workpiece top the way you normally do
-it, press **Calibrate setter** on the pyvcp panel, or run
+With a tool clamped, jog Z down until the tool meets the workpiece top, then
+press **Touch off Z** on the pyvcp panel, or run
 
-    o<setter_cal> call
+    o<setter_touchoff_z> call
+
+It sets Z zero where the tool stands, then drives to the setter and probes.
+Stand clear before pressing — the machine moves on its own from there.
 
 The status line reports D. Sanity-check the sign: positive when the setter
 trigger point sits above the workpiece top, negative when the workpiece is
@@ -177,8 +177,13 @@ storage works. Repeat this check after a LinuxCNC upgrade.
 
 ### 8. Use it
 
-Tool change: stop, swap the tool, then press **Zero Z from setter** on the
-pyvcp panel, or run
+New setup: jog to the X and Y datum and press **Touch off X** and **Touch off
+Y**, then jog Z down to the workpiece top and press **Touch off Z**. The panel
+buttons zero at 0 with no dialog; AXIS's own Touch Off still works if an offset
+needs typing.
+
+Tool change: stop, swap the tool, then press **Touch new tool** on the pyvcp
+panel, or run
 
     o<setter_zero> call
 
@@ -186,10 +191,7 @@ Z zero is restored. The panel's probe LED follows `motion.probe-input` — green
 means triggered, so it should be red with the plunger released. X and Y are
 untouched, so they survive a tool change on their own.
 
-New setup: Touch Off Z on the workpiece the way you always do, then press
-**Calibrate setter**. A stray press of it stores a D against whatever Z zero is
-current, so keep it to once per setup.
-
-Recalibrate with `setter_cal` whenever the workpiece or the setter moves. The
-macro cannot detect a stale D — it will happily zero against the previous
-setup's number.
+**Touch off Z** recalibrates every time it is pressed, so press it once per
+setup and again whenever the workpiece or the setter moves. `setter_zero`
+cannot detect a stale D — it will happily zero against the previous setup's
+number.

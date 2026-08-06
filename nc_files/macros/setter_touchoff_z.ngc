@@ -1,0 +1,13 @@
+(setter_touchoff_z -- zero Z on the workpiece and calibrate the setter)
+(Jog down to the workpiece top, then run this instead of AXIS Touch Off:)
+(  o<setter_touchoff_z> call)
+(It sets Z zero here, then drives to the setter and measures D, so a later)
+(tool change only needs o<setter_zero> call.)
+
+o<setter_touchoff_z> sub
+
+  G10 L20 P0 Z0
+
+  o<setter_cal> call
+
+o<setter_touchoff_z> endsub
