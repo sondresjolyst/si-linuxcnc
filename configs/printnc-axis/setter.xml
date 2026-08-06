@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <pyvcp>
-  <labelframe text="Tool setter">
+  <labelframe text="Touch off">
     <font>("Helvetica",10)</font>
 
     <button>
@@ -9,7 +9,10 @@
       <halpin>"touchoff-x"</halpin>
       <text>"Touch off X"</text>
       <font>("Helvetica",10)</font>
+      <pady>2</pady>
     </button>
+
+    <label><text>" "</text><font>("Helvetica",2)</font></label>
 
     <button>
       <relief>RAISED</relief>
@@ -17,7 +20,10 @@
       <halpin>"touchoff-y"</halpin>
       <text>"Touch off Y"</text>
       <font>("Helvetica",10)</font>
+      <pady>2</pady>
     </button>
+
+    <label><text>" "</text><font>("Helvetica",2)</font></label>
 
     <button>
       <relief>RAISED</relief>
@@ -25,15 +31,15 @@
       <halpin>"touchoff-z"</halpin>
       <text>"Touch off Z"</text>
       <font>("Helvetica",10)</font>
+      <pady>2</pady>
     </button>
 
-    <button>
-      <relief>RAISED</relief>
-      <bd>3</bd>
-      <halpin>"setter-zero"</halpin>
-      <text>"Touch new tool"</text>
-      <font>("Helvetica",10)</font>
-    </button>
+  </labelframe>
+
+  <label><text>" "</text><font>("Helvetica",4)</font></label>
+
+  <labelframe text="Tool setter">
+    <font>("Helvetica",10)</font>
 
     <hbox>
       <label>
@@ -47,6 +53,17 @@
         <off_color>"red"</off_color>
       </led>
     </hbox>
+
+    <label><text>" "</text><font>("Helvetica",4)</font></label>
+
+    <button>
+      <relief>RAISED</relief>
+      <bd>3</bd>
+      <halpin>"setter-zero"</halpin>
+      <text>"Touch new tool"</text>
+      <font>("Helvetica",10)</font>
+      <pady>2</pady>
+    </button>
 
   </labelframe>
 </pyvcp>

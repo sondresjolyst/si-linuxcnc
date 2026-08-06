@@ -22,8 +22,9 @@ those parameters persist in `linuxcnc.var` across restarts.
 
 ## Panel
 
-`setter.xml` adds a pyvcp panel with four buttons and an LED following
-`motion.probe-input`.
+`setter.xml` adds two pyvcp panels: **Touch off**, holding the three axis
+buttons, and **Tool setter**, holding an LED that follows `motion.probe-input`
+and the tool change button.
 
 | Button | Macro | Use |
 |---|---|---|
