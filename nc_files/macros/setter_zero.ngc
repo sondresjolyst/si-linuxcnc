@@ -1,0 +1,25 @@
+(setter_zero -- restore Z zero after a tool change)
+
+(Probes the setter with the newly clamped tool and sets work Z zero so that)
+(the trigger point reads D. Requires a calibration from setter_cal for the)
+(workpiece currently on the table; aborts if none is marked valid.)
+
+o<setter_zero> sub
+
+  o110 if [#5381 NE 1]
+    (abort, setter_zero: no calibration for this setup, run o<setter_cal> call while Z zero is still good)
+  o110 endif
+
+  M70
+
+  o<setter_probe> call
+
+  G10 L20 P0 Z#5383
+
+  (debug, Z zero restored from setter: D = #5383)
+
+  G53 G0 Z#<_ini[TOOLSENSOR]SAFE_Z>
+
+  M72
+
+o<setter_zero> endsub

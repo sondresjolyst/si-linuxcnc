@@ -1,0 +1,26 @@
+(setter_cal -- measure the setter against the current work Z zero)
+
+(Probes the setter and stores D, the trigger height in the active work)
+(coordinate system. D is a property of the setup rather than of the tool, so)
+(any later tool can be zeroed from it. Requires a correct Z zero; setter_zero)
+(is the inverse operation.)
+
+(D is stored in the G59.3 origin, which persists across restarts: #5383 holds)
+(D and #5381 = 1 marks it valid. D is negative when the workpiece top sits)
+(above the trigger height, so a nonzero test is not sufficient.)
+
+o<setter_cal> sub
+
+  M70
+
+  o<setter_probe> call
+
+  G10 L2 P9 X1 Z#5063
+
+  (debug, setter calibrated: D = #5383 mm above work Z zero)
+
+  G53 G0 Z#<_ini[TOOLSENSOR]SAFE_Z>
+
+  M72
+
+o<setter_cal> endsub

@@ -67,7 +67,7 @@ loadrt charge_pump
 # make posn loop type
 
 #loadrt hal_pi_gpio dir=58717087 exclude=0 
-loadrt hal_gpio inputs=PIN26,PIN32,PIN33,PIN24 outputs=PIN12,PIN37,PIN21,PIN19,PIN23,PIN29,PIN31,PIN35,PIN11,PIN16,PIN13,PIN18 
+loadrt hal_gpio inputs=PIN26,PIN32,PIN33,PIN24,PIN22 outputs=PIN12,PIN37,PIN21,PIN19,PIN23,PIN29,PIN31,PIN35,PIN11,PIN16,PIN13,PIN18 
 
 
 loadrt stepgen step_type=0,0,0,0
@@ -237,6 +237,20 @@ net min-home-xz	<= hal_gpio.PIN33-in
 #net min-home-z	<= hal_gpio.PIN33-in
 #net all-limit   <= hal_gpio.PIN24-in
 #pin 22 is the eSTOP
+
+##############################################
+#				Probe Input
+##############################################
+# Tool setter probe contact, breakout board terminal P11 = header pin 24.
+# Normally closed: FALSE released, TRUE triggered, which is the polarity
+# motion.probe-input expects.
+net probe-input motion.probe-input <= hal_gpio.PIN24-in
+
+# Tool setter over-travel contact, breakout board terminal P10 = header pin 22.
+# Normally closed: TRUE when the plunger bottoms out or the cable is broken.
+# Faults joint 3, recoverable with Override Limits.
+net z-neg-limit <= hal_gpio.PIN22-in
+net z-neg-limit => joint.3.neg-lim-sw-in
 
 #net X-home hal_pi_gpio.pin-22-in => axis.0.home-sw-in axis.0.neg-lim-sw-in
 #net Y-home hal_pi_gpio.pin-24-in => axis.1.home-sw-in axis.1.neg-lim-sw-in

@@ -6,3 +6,20 @@
 #net spindle-at-speed => pyvcp.spindle-at-speed
 #net pyvcp-spindle-rpm spindle-vfd.spindle-speed-fb => pyvcp.spindle-speed
 #net pyvcp-modbus-ok spindle-vfd.hycomm-ok => pyvcp.hycomm-ok
+
+# Tool setter panel, setter.xml.
+net probe-input => pyvcp.probe-led
+net setter-zero    pyvcp.setter-zero    => halui.mdi-command-00
+net setter-cal     pyvcp.setter-cal     => halui.mdi-command-04
+
+# The touch off buttons go through setter_confirm.py, which names the axis in
+# an OK/Cancel dialog before releasing the command.
+loadusr -Wn confirm ./setter_confirm.py
+
+net touchoff-x     pyvcp.touchoff-x     => confirm.x-req
+net touchoff-y     pyvcp.touchoff-y     => confirm.y-req
+net touchoff-z     pyvcp.touchoff-z     => confirm.z-req
+
+net touchoff-x-go  confirm.x-go         => halui.mdi-command-01
+net touchoff-y-go  confirm.y-go         => halui.mdi-command-02
+net touchoff-z-go  confirm.z-go         => halui.mdi-command-03
