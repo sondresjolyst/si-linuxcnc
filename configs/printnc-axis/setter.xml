@@ -77,4 +77,81 @@
     </button>
 
   </labelframe>
+
+  <label><text>" "</text><font>("Helvetica",4)</font></label>
+
+  <labelframe text="Spindle">
+    <font>("Helvetica",10)</font>
+
+    <hbox>
+      <label><text>"VFD  "</text><font>("Helvetica",10)</font></label>
+      <led>
+        <halpin>"vfd-led"</halpin>
+        <size>18</size>
+        <on_color>"green"</on_color>
+        <off_color>"red"</off_color>
+      </led>
+    </hbox>
+
+    <label><text>" "</text><font>("Helvetica",4)</font></label>
+
+    <hbox>
+      <label><text>"Speed    "</text><font>("Helvetica",10)</font></label>
+      <number>
+        <halpin>"spindle-rpm"</halpin>
+        <format>"5.0f"</format>
+        <font>("Helvetica",10)</font>
+      </number>
+      <label><text>" rpm"</text><font>("Helvetica",10)</font></label>
+    </hbox>
+
+    <hbox>
+      <label><text>"Current  "</text><font>("Helvetica",10)</font></label>
+      <number>
+        <halpin>"spindle-current"</halpin>
+        <format>"5.2f"</format>
+        <font>("Helvetica",10)</font>
+      </number>
+      <label><text>" A"</text><font>("Helvetica",10)</font></label>
+    </hbox>
+
+  </labelframe>
+
+  <label><text>" "</text><font>("Helvetica",4)</font></label>
+
+  <labelframe text="Progress">
+    <font>("Helvetica",10)</font>
+
+    <bar>
+      <halpin>"prog-percent"</halpin>
+      <min_>0</min_>
+      <max_>100</max_>
+      <format>"3.0f"</format>
+      <bgcolor>"grey"</bgcolor>
+      <fillcolor>"green"</fillcolor>
+    </bar>
+
+    <label><text>" "</text><font>("Helvetica",4)</font></label>
+
+    <hbox>
+      <label><text>"Left     "</text><font>("Helvetica",10)</font></label>
+      <number>
+        <halpin>"prog-remain"</halpin>
+        <format>"5.1f"</format>
+        <font>("Helvetica",10)</font>
+      </number>
+      <label><text>" min"</text><font>("Helvetica",10)</font></label>
+    </hbox>
+
+    <hbox>
+      <label><text>"Elapsed  "</text><font>("Helvetica",10)</font></label>
+      <number>
+        <halpin>"prog-elapsed"</halpin>
+        <format>"5.1f"</format>
+        <font>("Helvetica",10)</font>
+      </number>
+      <label><text>" min"</text><font>("Helvetica",10)</font></label>
+    </hbox>
+
+  </labelframe>
 </pyvcp>

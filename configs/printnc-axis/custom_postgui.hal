@@ -1,11 +1,11 @@
 # Include your custom_postgui HAL commands here
 # This file will not be overwritten when you run stepconf again
-# net spindle-speed-fb <= pyvcp.spindle_feedback_bar
-# net spindle-at-speed <= pyvcp.spindle_at_speed_led
 
-#net spindle-at-speed => pyvcp.spindle-at-speed
-#net pyvcp-spindle-rpm spindle-vfd.spindle-speed-fb => pyvcp.spindle-speed
-#net pyvcp-modbus-ok spindle-vfd.hycomm-ok => pyvcp.hycomm-ok
+# Spindle panel, fed by the hy_vfd signals from ../common/cncRouter.hal.
+# hy_vfd reports the speed in rpm and the output current in amps.
+net spindle-speed-fb => pyvcp.spindle-rpm
+net spindle-current  => pyvcp.spindle-current
+net spindle-comm-ok  => pyvcp.vfd-led
 
 # Tool setter panel, setter.xml.
 net probe-input => pyvcp.probe-led
@@ -23,3 +23,10 @@ net touchoff-z     pyvcp.touchoff-z     => confirm.z-req
 net touchoff-x-go  confirm.x-go         => halui.mdi-command-01
 net touchoff-y-go  confirm.y-go         => halui.mdi-command-02
 net touchoff-z-go  confirm.z-go         => halui.mdi-command-03
+
+# Progress panel, fed by ../common/progress.py.
+source ../common/progress.hal
+
+net prog-percent progress.percent     => pyvcp.prog-percent
+net prog-remain  progress.remain-min  => pyvcp.prog-remain
+net prog-elapsed progress.elapsed-min => pyvcp.prog-elapsed

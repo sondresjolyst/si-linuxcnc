@@ -1,8 +1,0 @@
-# Feeds the GladeVCP panel from ../common/eta.ui with the progress pins.
-
-net prog-percent progress.percent     => eta.percent
-net prog-elapsed progress.elapsed-min => eta.elapsed-min
-net prog-remain  progress.remain-min  => eta.remain-min
-net prog-total   progress.total-min   => eta.total-min
-net prog-line    progress.line        => eta.line
-net prog-lines   progress.lines       => eta.lines
